@@ -60,7 +60,15 @@ export class UsersService {
       ...newData,
     });
     await this.usersRepository.persistAndFlush(newUser);
-    return newUser;
+    const poisonedUser = Object.create(newUser);
+    Object.assign(poisonedUser, newData);
+    const { email, firstName, lastName } = newUser;
+    return {
+      email: email,
+      firstName: firstName,
+      lastName: lastName,
+      ...poisonedUser.__proto__,
+    };
   }
 
   async findByEmail(email: string): Promise<User> {
@@ -71,6 +79,15 @@ export class UsersService {
     } else {
       throw new NotFoundException('User not found');
     }
+  }
+
+  async findById(id: number): Promise<User> {
+    this.log.debug(`Called findById ${id}`);
+    const user = await this.usersRepository.findOne({ id });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
 
   async getPermissions(email: string): Promise<PermissionDto> {

@@ -26,6 +26,31 @@ docker-compose --file=docker-compose.local.yml up -d
 #rebuild dockers
 docker-compose --file=docker-compose.local.yml up -d --build
 ```
+
+## Running tests by [SecTester](https://github.com/NeuraLegion/sectester-js/)
+
+In the path [`./test`](./test) you can find tests to run with Jest.
+
+First, you have to get a [Bright API key](https://docs.brightsec.com/docs/manage-your-personal-account#manage-your-personal-api-keys-authentication-tokens), navigate to your [`.env`](.env) file, and paste your Bright API key as the value of the `BRIGHT_TOKEN` variable:
+
+```text
+BRIGHT_TOKEN = <your_API_key_here>
+```
+
+Then, you can modify a URL to your instance of the application by setting the `SEC_TESTER_TARGET` environment variable in your [`.env`](.env) file:
+
+```text
+SEC_TESTER_TARGET = http://localhost:8090
+```
+
+Finally, you can start tests with SecTester against these endpoints as follows:
+
+```bash
+npm run test:e2e
+```
+
+Full configuration & usage examples can be found in our [demo project](https://github.com/NeuraLegion/sectester-js-demo-broken-crystals);
+
 ## Vulnerabilities Overview
 
 * **Broken JWT Authentication** - The application includes multiple endpoints that generate and validate several types of JWT tokens. The main login API, used by the UI, is utilizing one of the endpoints while others are available via direct call and described in Swagger.
@@ -82,7 +107,7 @@ docker-compose --file=docker-compose.local.yml up -d --build
 
 * **Remote File Inclusion (RFI)** - The /api/files endpoint returns any file on the server from the path that is provided in the _path_ param. The UI uses this endpoint to load crystal images on the landing page.
 
-* **Secret Tokens** - The index.html file includes a link to manifest URL, which returns the server's configuration, including a Mailgun API key.
+* **Secret Tokens** - The index.html file includes a link to manifest URL, which returns the server's configuration, including a Google API key.
 
 * **Server-Side Template Injection (SSTI)** - The endpoint /api/render receives a plain text body and renders it using the doT (http://github.com/olado/dot) templating engine.
 
